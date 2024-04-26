@@ -1,8 +1,13 @@
 import { Injectable } from "@nestjs/common";
+import { User } from "./users.interface";
+import { readdir } from "fs/promises";
+
 
 @Injectable()
 export class UsersRepository {
-    private users = [
+    
+    
+    private users: User[] = [
         {
             id: 1,
             email: "user1@example.com",
@@ -68,5 +73,32 @@ export class UsersRepository {
 
     async getUsers() {
         return await this.users;
+    }
+    async getUserById(id: number): Promise<User> {
+        return await this.users.find(user => user.id === id);
+        
+    }
+    async createUser(user: User): Promise<User> {
+        const id = this.users.length + 1;
+        this.users = [...this.users, { id, ...user }];
+        return await { id, ...user };
+    }
+    async updateUser(id: number, user: User): Promise<User> {
+        this.users = this.users.map(
+            u => u.id === id ? { ...u, ...user } : u);
+        return await this.getUserById(id);
+    }
+    async deleteUser(id: number): Promise<void> {
+        this.users = await this.users.filter(user => user.id !== id);
+        return;
+    }
+
+    async signIn(email: string, password: string): Promise<string> {
+        const user = await this.users.find(user => user.email === email && user.password === password);
+        if (user) {
+            return "User signed in successfully";
+        } else {
+            return "User not found";
+        }
     }
 }

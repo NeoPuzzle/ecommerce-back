@@ -1,8 +1,12 @@
 import { Injectable } from "@nestjs/common";
+import { Product } from "./users.interface";
+
+
 
 @Injectable()
 export class ProductsRepository {
-    private products = [
+
+    private products: Product[] = [
         {
             id: 1,
             name: "Laptop HP Pavilion",
@@ -104,5 +108,30 @@ export class ProductsRepository {
 
     async getProducts() {
     return await this.products;
+    }
+
+    async getProductById(id: number): Promise<Product> {
+        const product = await this.products.find(product => product.id === id);
+        if(product) {
+            return product;
+        } else {
+            return undefined;
+        }
+    }
+
+    async createProduct(product: Product): Promise<Product> {
+        const id = this.products.length + 1;
+        this.products = [...this.products, { id, ...product }];
+        return { id, ...product };
+    }
+    
+    async updateProduct(id: number, product: Product): Promise<Product> {
+        this.products = this.products.map(
+            p => p.id === id ? { ...p, ...product } : p);
+        return await this.getProductById(id);
+    }    
+
+    async deleteProduct(id: number) {
+        return await this.products.filter(product => product.id !== id);        
     }
 }
