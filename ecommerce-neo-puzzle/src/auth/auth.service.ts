@@ -10,7 +10,11 @@ export class AuthService {
         return 'Get all auth';
     }
 
-    async signIn(email: string, password: string): Promise<string> {
-        return this.usersRepository.signIn(email, password);
+    async signIn(email: string, password: string) {
+        if(!email || !password) return 'Invalid credentials';
+        const user = this.usersRepository.getUserByEmail(email);
+        if(!user) return 'User not found';
+        if(user.password === password) return 'Usuario logueado';
+        return 'Invalid credentials';
     }
 }

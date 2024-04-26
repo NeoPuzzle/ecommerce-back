@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './users.interface';
-import { AuthGuard } from '../auth/auth.guard';
+import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -9,30 +9,33 @@ export class UsersController {
 
     @Get()
     @UseGuards(AuthGuard)
-    async getUsers(): Promise<User[]>{
-        return this.usersService.getUsers();
+    getUsers(@Query('page') page: string, @Query('limit') limit: string){
+        if (page && limit){
+            return this.usersService.getUsers(Number(page), Number(limit));
+        }
+        return this.usersService.getUsers(1, 5);
     }
 
     @Get(':id')
     @UseGuards(AuthGuard)
-    async getUserById(@Param('id') id: string): Promise<User>{
-        return this.usersService.getUserById(Number(id));
+    getUserById(@Param('id') id: string){
+        return this.usersService.getUserById(id);
     }
 
     @Post()
-    async createUser(@Body() user: User): Promise<User>{
+    createUser(@Body() user: User){
         return this.usersService.createUser(user);
     }
 
     @Put(':id')
     @UseGuards(AuthGuard)
-    async updateUser(@Param('id') id: string, @Body() user: User): Promise<User>{
-        return this.usersService.updateUser(Number(id), user);
+    updateUser(@Param('id') id: string, @Body() user: User){
+        return this.usersService.updateUser(id, user);
     }
 
     @Delete(':id')
     @UseGuards(AuthGuard)
-    async deleteUser(@Param('id') id: string): Promise<void>{
-        return this.usersService.deleteUser(Number(id));
+    deleteUser(@Param('id') id: string){
+        return this.usersService.deleteUser(id);
     }
 }

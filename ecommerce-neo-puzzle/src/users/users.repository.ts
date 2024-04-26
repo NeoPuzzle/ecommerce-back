@@ -9,7 +9,7 @@ export class UsersRepository {
     
     private users: User[] = [
         {
-            id: 1,
+            id: "1",
             email: "user1@example.com",
             name: "John Doe",
             password: "password1",
@@ -19,7 +19,7 @@ export class UsersRepository {
             city: "New York"
         },
         {
-            id: 2,
+            id: "2",
             email: "user2@example.com",
             name: "Jane Smith",
             password: "password2",
@@ -29,7 +29,7 @@ export class UsersRepository {
             city: "Los Angeles"
         },
         {
-            id: 3,
+            id: "3",
             email: "user3@example.com",
             name: "Alice Johnson",
             password: "password3",
@@ -39,7 +39,7 @@ export class UsersRepository {
             city: "Chicago"
         },
         {
-            id: 4,
+            id: "4",
             email: "user4@example.com",
             name: "Bob Brown",
             password: "password4",
@@ -49,7 +49,7 @@ export class UsersRepository {
             city: "Houston"
         },
         {
-            id: 5,
+            id: "5",
             email: "user5@example.com",
             name: "Emily Davis",
             password: "password5",
@@ -59,7 +59,7 @@ export class UsersRepository {
             city: "San Francisco"
         },
         {
-            id: 6,
+            id: "6",
             email: "user6@example.com",
             name: "Michael Wilson",
             password: "password6",
@@ -71,34 +71,41 @@ export class UsersRepository {
     ];
     
 
-    async getUsers() {
-        return await this.users;
+    async getUsers(page: number, limit: number) {
+        const start = (page - 1) * limit;
+        const end = start + limit;
+        const usersList = this.users.slice(start, end);
+        return usersList.map(({password, ...userNoPassword}) => userNoPassword)
     }
-    async getUserById(id: number): Promise<User> {
-        return await this.users.find(user => user.id === id);
+    async getUserById(id: string) {
+        const foundIndex = this.users.findIndex(user => user.id === id);
+        if (foundIndex === -1) return `User with id ${id} not found`;
+        const {password, ...userNoPassword} = this.users[foundIndex];
+        return userNoPassword;
         
     }
-    async createUser(user: User): Promise<User> {
-        const id = this.users.length + 1;
-        this.users = [...this.users, { id, ...user }];
-        return await { id, ...user };
+    async createUser(user: Omit<User, 'id'>) {
+        this.users.push({...user, id: user.email});
+        //return user.id;
+        const {password, ...userNoPassword} = user;
+        return userNoPassword;
     }
-    async updateUser(id: number, user: User): Promise<User> {
-        this.users = this.users.map(
-            u => u.id === id ? { ...u, ...user } : u);
-        return await this.getUserById(id);
+    async updateUser(id: string, user: User) {
+        const foundIndex = this.users.findIndex(user => user.id === id);
+        if (foundIndex === -1) return `User with id ${id} not found`;
+        this.users[foundIndex] = {...this.users[foundIndex], ...user};
+        return this.users[foundIndex].id;
     }
-    async deleteUser(id: number): Promise<void> {
-        this.users = await this.users.filter(user => user.id !== id);
-        return;
+    async deleteUser(id: string) {
+        const foundIndex = this.users.findIndex(user => user.id === id);
+        if (foundIndex === -1) return `User with id ${id} not found`;
+        this.users.splice(foundIndex, 1);
+        return `User with id ${id} deleted`;
+        
     }
 
-    async signIn(email: string, password: string): Promise<string> {
-        const user = await this.users.find(user => user.email === email && user.password === password);
-        if (user) {
-            return "User signed in successfully";
-        } else {
-            return "User not found";
-        }
+    getUserByEmail(email: string) {
+        return this.users.find(user => user.email === email);
+        
     }
 }

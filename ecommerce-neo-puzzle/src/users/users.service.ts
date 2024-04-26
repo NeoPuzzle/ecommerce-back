@@ -7,19 +7,19 @@ export class UsersService {
 
     constructor(private readonly usersRepository: UsersRepository) {}
 
-    getUsers(){
-        return this.usersRepository.getUsers();
+    getUsers(page: number, limit: number){
+        return this.usersRepository.getUsers(page, limit);
     }
-    getUserById(id: number): Promise<User> {
+    getUserById(id: string) {
         return this.usersRepository.getUserById(id);
     }
-    createUser(user: User): Promise<User> {
+    createUser(user: User) {
         return this.usersRepository.createUser(user);
     }
-    updateUser(id: number, user: User): Promise<User> { 
+    updateUser(id: string, user: User) { 
         return this.usersRepository.updateUser(id, user);
     }
-    deleteUser(id: number): void | Promise<void> {
+    deleteUser(id: string) {
         return this.usersRepository.deleteUser(id);
     }
 }
