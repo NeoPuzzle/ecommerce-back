@@ -1,29 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import { ProductsRepository } from './products.repository';
-import { Product } from './users.interface';
+import { IProduct } from './products.interface';
 
 @Injectable()
 export class ProductsService {
 
     constructor(private readonly productsRepository: ProductsRepository) {}
 
-    async getProducts(): Promise<Product[]> {
+    async getProducts() {
         return this.productsRepository.getProducts();
     }
 
-    async getProductById(id: number): Promise<Product> {
+    async getProductById(id: string) {
         return this.productsRepository.getProductById(id);
     }
 
-    async createProduct(product: Product): Promise<Product> {
+    async createProduct(product: IProduct) {
         return this.productsRepository.createProduct(product);
     }
 
-    async updateProduct(id: number, product: Product): Promise<Product> {
+    async updateProduct(id: string, product: IProduct) {
         return this.productsRepository.updateProduct(id, product);
     }
 
-    async deleteProduct(id: number): Promise<void> {
-        await this.productsRepository.deleteProduct(id);
+    async deleteProduct(id: string) {
+        return this.productsRepository.deleteProduct(id);
+    }
+
+    preLoadProducts() {
+        return this.productsRepository.preLoadProducts();
     }
 }

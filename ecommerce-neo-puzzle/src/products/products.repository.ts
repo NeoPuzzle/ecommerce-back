@@ -1,137 +1,160 @@
 import { Injectable } from "@nestjs/common";
-import { Product } from "./users.interface";
-
+import { IProduct } from "./products.interface";
+import { Product } from "./products.entity";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { ProductsDto } from "src/dto/products.dto";
 
 
 @Injectable()
 export class ProductsRepository {
+    constructor(
+        @InjectRepository(Product)
+        private productRepository: Repository<Product>,
+    ) {}
 
-    private products: Product[] = [
+
+
+    private products: IProduct[] = [
         {
-            id: 1,
+            id: "1",
             name: "Laptop HP Pavilion",
             description: "Potente laptop con procesador Intel Core i7 y pantalla de 15.6 pulgadas.",
             price: 899.99,
-            stock: true,
+            stock: 12,
             imgUrl: "https://example.com/laptop-hp-pavilion.jpg"
         },
         {
-            id: 2,
+            id: "2",
             name: "Smartphone Samsung Galaxy S21",
             description: "Teléfono inteligente de alta gama con pantalla AMOLED de 6.2 pulgadas y cámara de 108 MP.",
             price: 1099.99,
-            stock: true,
+            stock: 32,
             imgUrl: "https://example.com/samsung-galaxy-s21.jpg"
         },
         {
-            id: 3,
+            id: "3",
             name: "Tablet Apple iPad Pro",
             description: "Potente tablet con pantalla Retina de 12.9 pulgadas y chip M1 de Apple.",
             price: 1299.99,
-            stock: true,
+            stock: 2,
             imgUrl: "https://example.com/apple-ipad-pro.jpg"
         },
         {
-            id: 4,
+            id: "4",
             name: "Smart TV LG OLED",
             description: "Televisor inteligente con pantalla OLED de 55 pulgadas y resolución 4K.",
             price: 1799.99,
-            stock: true,
+            stock: 5,
             imgUrl: "https://example.com/lg-oled-tv.jpg"
         },
         {
-            id: 5,
+            id: "5",
             name: "Cámara Canon EOS Rebel T7",
             description: "Cámara réflex digital con sensor CMOS de 24.1 MP y grabación de video Full HD.",
             price: 599.99,
-            stock: true,
+            stock: 21,
             imgUrl: "https://example.com/canon-eos-rebel-t7.jpg"
         },
         {
-            id: 6,
+            id: "6",
             name: "Auriculares Sony WH-1000XM4",
             description: "Auriculares inalámbricos con cancelación de ruido y hasta 30 horas de autonomía.",
             price: 349.99,
-            stock: true,
+            stock: 54,
             imgUrl: "https://example.com/sony-wh-1000xm4.jpg"
         },
         {
-            id: 7,
+            id: "7",
             name: "Impresora Epson EcoTank",
             description: "Impresora de inyección de tinta con tanque de tinta recargable y conexión Wi-Fi.",
             price: 299.99,
-            stock: true,
+            stock: 13,
             imgUrl: "https://example.com/epson-ecotank-printer.jpg"
         },
         {
-            id: 8,
+            id: "8",
             name: "Robot aspirador Roomba",
             description: "Robot aspirador inteligente con navegación avanzada y función de mapeo de la casa.",
             price: 499.99,
-            stock: true,
+            stock: 23,
             imgUrl: "https://example.com/roomba-vacuum.jpg"
         },
         {
-            id: 9,
+            id: "9",
             name: "Teclado mecánico Razer BlackWidow",
             description: "Teclado para juegos con interruptores mecánicos y retroiluminación personalizable.",
             price: 149.99,
-            stock: true,
+            stock: 31,
             imgUrl: "https://example.com/razer-blackwidow-keyboard.jpg"
         },
         {
-            id: 10,
+            id: "10",
             name: "Mouse Logitech MX Master 3",
             description: "Mouse inalámbrico ergonómico con sensor de alta precisión y botón de rueda de desplazamiento rápido.",
             price: 99.99,
-            stock: true,
+            stock: 42,
             imgUrl: "https://example.com/logitech-mx-master-3.jpg"
         },
         {
-            id: 11,
+            id: "11",
             name: "Monitor Dell UltraSharp",
             description: "Monitor IPS de 27 pulgadas con resolución 4K y cobertura de color 99% sRGB.",
             price: 699.99,
-            stock: true,
+            stock: 9,
             imgUrl: "https://example.com/dell-ultrasharp-monitor.jpg"
         },
         {
-            id: 12,
+            id: "12",
             name: "Altavoz Bluetooth JBL Charge 4",
             description: "Altavoz portátil resistente al agua con batería de hasta 20 horas de reproducción.",
             price: 149.99,
-            stock: true,
+            stock: 10,
             imgUrl: "https://example.com/jbl-charge-4-speaker.jpg"
         }
     ];
     
 
     async getProducts() {
-    return await this.products;
+    return this.products;
     }
 
-    async getProductById(id: number): Promise<Product> {
-        const product = await this.products.find(product => product.id === id);
-        if(product) {
-            return product;
-        } else {
-            return undefined;
-        }
+    async getProductById(id: string) {
+        const product = this.products.findIndex(product => product.id === id);
+        if (product === -1) return `Product with id ${id} not found`;
+        return this.products[product];
     }
 
-    async createProduct(product: Product): Promise<Product> {
-        const id = this.products.length + 1;
-        this.products = [...this.products, { id, ...product }];
-        return { id, ...product };
+    // async createProduct(product:  IProduct) {
+    //     const id = this.products.length + 1;
+    //     this.products = [...this.products, { id, ...product }];
+    //     return { id, ...product };
+    // }
+
+    async createProduct(product: ProductsDto) {
+        const existingProduct = await this.productRepository.findOne({ where: { name: product.name } });
+        if (existingProduct) return `Product with name ${product.name} already exists`;
+        const newProduct = await this.productRepository.create(product);
+        await this.productRepository.save(newProduct);
+        return newProduct;
     }
     
-    async updateProduct(id: number, product: Product): Promise<Product> {
-        this.products = this.products.map(
-            p => p.id === id ? { ...p, ...product } : p);
-        return await this.getProductById(id);
+    async updateProduct(id: string, product: IProduct) {
+        const productIndex = this.products.findIndex(product => product.id === id);
+        if (productIndex === -1) return `Product with id ${id} not found`;
+        this.products[productIndex] = { ...this.products[productIndex], ...product };
+        return this.products[productIndex].id;
     }    
 
-    async deleteProduct(id: number) {
-        return await this.products.filter(product => product.id !== id);        
+    async deleteProduct(id: string) {
+        const productIndex = this.products.findIndex(product => product.id === id);
+        if (productIndex === -1) return `Product with id ${id} not found`;
+        this.products.splice(productIndex, 1);
+        return `Product with id ${id} deleted`;        
+    }
+
+    async preLoadProducts() {
+        const products = await this.productRepository.find();
+        return products;
     }
 }

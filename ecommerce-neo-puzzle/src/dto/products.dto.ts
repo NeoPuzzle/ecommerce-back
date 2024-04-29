@@ -1,9 +1,8 @@
-export interface Product {
-    id:number;
+export interface ProductsDto {
     name: string;
     description: string;
     price: number;
-    stock: boolean;
+    stock: number;
     imgUrl: string;
 
 }
