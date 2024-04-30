@@ -5,15 +5,14 @@ import { UsersModule } from './users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import typeOrmConfig from './config/typeorm';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Category } from './categories/categories.entity';
-import { Product } from './products/products.entity';
-import { PreloadService } from './helpers/preload.data';
 import { CategoriesModule } from './categories/categories.module';
 import { OrdersModule } from './orders/orders.module';
+import { Categories } from './entities/categories.entity';
+import { Products } from './entities/products.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Category, Product]),
+    TypeOrmModule.forFeature([Categories, Products]),
     ConfigModule.forRoot({
     isGlobal: true,
     load: [typeOrmConfig]
@@ -25,6 +24,6 @@ import { OrdersModule } from './orders/orders.module';
     }),
     AuthModule, ProductsModule, UsersModule, CategoriesModule, OrdersModule],
   controllers: [],
-  providers: [PreloadService],
+  providers: [],
 })
 export class AppModule {}

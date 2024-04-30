@@ -1,27 +1,32 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Category } from "./categories.entity";
+import { Categories } from "../entities/categories.entity";
 import { Repository } from "typeorm";
-import { CategoryDto } from "src/dto/category.dto";
+import * as data from '../data/data.json';
 
 @Injectable()
 export class CategoriesRepository {
     constructor(
-        @InjectRepository(Category)
-        private categoryRepository: Repository<Category>
+        @InjectRepository(Categories)
+        private categoryRepository: Repository<Categories>
     ) {}
     
     async getCategories() {
-        const categories = await this.categoryRepository.find();
-        return categories;
+        return await this.categoryRepository.find();
+        
     }
     
-    async addCategory(categories: CategoryDto) {
-        const existingCategory = await this.categoryRepository.findOne({where: {name: categories.name}});
-        if (existingCategory) return `Category ${categories.name} already exists`;
-        const newCategory = await this.categoryRepository.create(categories);
-        this.categoryRepository.save(newCategory);
-        return newCategory;
+    async addCategories() {
+        data?.map(async (element) => {
+            await this.categoryRepository
+                .createQueryBuilder()
+                .insert()
+                .into(Categories)
+                .values({name: element.category})
+                .orIgnore()
+                .execute();
+        });
+        return 'Categories added successfully';
     }
     
 }

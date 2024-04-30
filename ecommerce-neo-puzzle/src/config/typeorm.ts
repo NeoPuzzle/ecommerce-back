@@ -1,8 +1,5 @@
 import { registerAs } from "@nestjs/config";
 import { config as dotenvConfig } from 'dotenv';
-// import { Category } from "src/categories/categories.entity";
-// import { Product } from "src/products/products.entity";
-import { User } from "src/users/users.entity";
 import { DataSource, DataSourceOptions } from "typeorm";
 
 
@@ -20,13 +17,10 @@ const config = {
     migrations: ['dist/migrations/*{.ts,.js}'],
     logging: true,
     autoLoadEntities: true,
-    synchronize: false,
+    synchronize: true,
     dropSchema: true,
 
 };
 
 export default registerAs('typeorm', () => config);
 export const connectionSource = new DataSource(config as DataSourceOptions);
-
-// export const ProductModel = connectionSource.getRepository(Product);
-// export const CategorieModel = connectionSource.getRepository(Category);

@@ -1,90 +1,94 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Order } from './orders.entity';
+import { Orders } from '../entities/orders.entity';
 import { DeepPartial, In, Repository } from 'typeorm';
-import { Product } from 'src/products/products.entity';
-import { OrderDetails } from 'src/orderdetails/orderdetails.entity';
+import { Products } from 'src/entities/products.entity';
+import { OrderDetails } from 'src/entities/orderdetails.entity';
 import { OrderDto } from 'src/dto/order.dto';
-import { User } from 'src/users/users.entity';
+import { Users } from 'src/entities/users.entity';
+import { log } from 'console';
 
-// @Injectable()
-export class OrdersRepository extends Repository<Order> {
+@Injectable()
+export class OrdersRepository {
 
     constructor(
-        @InjectRepository(Order)
-        private orderRepository: Repository<Order>,
-        @InjectRepository(User)
-        private userRepository: Repository<User>,
-        @InjectRepository(Product)
-        private productRepository: Repository<Product>,
+        @InjectRepository(Orders)
+        private orderRepository: Repository<Orders>,
+        @InjectRepository(Users)
+        private userRepository: Repository<Users>,
+        @InjectRepository(Products)
+        private productRepository: Repository<Products>,
         @InjectRepository(OrderDetails)
         private orderDetailsRepository: Repository<OrderDetails>,
         
-    ){
-        super(
-            orderRepository.target,
-            orderRepository.manager,
-            orderRepository.queryRunner,
-        );
-    }
+    ){}
 
-    async addOrder(userId: string, productcIds: string[]): Promise<{orderId: string, orderDetailsId: string, price: number}> {
+    async addOrder(userId: string, products: any){
+        let total = 0;
+
         const user = await this.userRepository.findOneBy({id: userId});
 
         if(!user){
-            throw new Error('User not found');
+            // throw new Error('User not found');
+            return `User with id ${userId} not found`
         }
-        const order = new Order();
+        const order = new Orders();
+        order.date = new Date();
         order.user = user;
 
-        const products = await this.productRepository.findByIds(productcIds);
+        const newOrder = await this.orderRepository.save(order);
 
-        const availableProducts = products.filter(product => product.stock > 0);    
+        const productsArray = await Promise.all(
+            products.map(async (element) => {
+                const product = await this.productRepository.findOneBy({
+                    id: element.id
+                });
+                if(!product){
+                    // throw new Error(`Product with id ${element.productId} not found`);
+                    return `Product with id ${element.id} not found`
+                }
 
-        if(availableProducts.length !== productcIds.length){
-            throw new Error('Some products are not available');
-        }
+                total += Number(product.price);
+                console.log(total);
 
-        const totalPrice = availableProducts.reduce((total, product) => total + product.price, 0);
+                await this.productRepository.update(
+                    {id: element.id},
+                    {stock: product.stock - 1}
+                );  
+
+                return product;
+            })
+        );
 
         const orderDetails = new OrderDetails();
-        orderDetails.price = totalPrice;
+        orderDetails.price = Number(Number(total).toFixed(2));
+        orderDetails.products = productsArray;
+        orderDetails.order = newOrder;
 
-        const savedOrderDetails = await this.orderDetailsRepository.manager.save(orderDetails);
-    
+        await this.orderDetailsRepository.save(orderDetails);
 
-        order.orderDetails = orderDetails;
-
-        for (const product of availableProducts) {
-            product.stock--;
-        }
-
-        await this.productRepository.save(availableProducts);
-
-        return {
-            orderId: order.id,
-            price: orderDetails.price,
-            orderDetailsId: orderDetails.id,
-        }
+        return  await this.orderRepository.find({
+            where: {id: newOrder.id},
+            relations: {
+                orderDetails: true,
+            }
+        });
     }
 
-    async getOrder(orderId: string): Promise<{order: Order, orderDetails: OrderDetails}> {
-        const order = await this.orderRepository.findOne({where: {id: orderId}});
-        if(!order){
-            throw new Error(`Order with id ${orderId} not found`);
-        }
-
-        const orderDetails = await this.orderDetailsRepository.findOne({
-            where: {
-                order: order
+    getOrder(id: string) {
+        const order = this.orderRepository.findOne({
+            where: {id},
+            relations: {
+                orderDetails: {
+                    products: true,
+                },
             },
-            relations: ['product']
-        });
-
-        if(!orderDetails){
-            throw new Error(`Order details for order with id ${orderId} not found`);
+            });
+        if(!order){
+            // throw new Error(`Order with id ${id} not found`);
+            return `Order with id ${id} not found`
         }
 
-        return { order, orderDetails };
+        return order;
     }
 }

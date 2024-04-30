@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { IUser } from './users.interface';
-import { User } from './users.entity';
+import { Users } from '../entities/users.entity';
 import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Controller('users')
@@ -24,13 +23,13 @@ export class UsersController {
     }
 
     @Post()
-    createUser(@Body() user: IUser){
-        return this.usersService.createUser(user);
+    createUser(@Body() user: Users){
+        return this.usersService.addUser(user);
     }
 
     @Put(':id')
     @UseGuards(AuthGuard)
-    updateUser(@Param('id') id: string, @Body() user: IUser){
+    updateUser(@Param('id') id: string, @Body() user: Users){
         return this.usersService.updateUser(id, user);
     }
 
