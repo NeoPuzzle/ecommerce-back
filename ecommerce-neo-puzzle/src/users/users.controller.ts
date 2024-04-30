@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, ValidationPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Users } from '../entities/users.entity';
 import { AuthGuard } from '../auth/guards/auth.guard';
+import { CreateUserDto } from 'src/dto/CreateUser.dto';
 
 @Controller('users')
 export class UsersController {
@@ -23,8 +24,8 @@ export class UsersController {
     }
 
     @Post()
-    createUser(@Body() user: Users){
-        return this.usersService.addUser(user);
+    createUser(@Body(ValidationPipe) createUserDto: CreateUserDto){
+        return this.usersService.addUser(createUserDto);
     }
 
     @Put(':id')

@@ -1,12 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Orders } from '../entities/orders.entity';
-import { DeepPartial, In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Products } from 'src/entities/products.entity';
 import { OrderDetails } from 'src/entities/orderdetails.entity';
-import { OrderDto } from 'src/dto/order.dto';
 import { Users } from 'src/entities/users.entity';
-import { log } from 'console';
+import { CreateOrderDto } from 'src/dto/CreateOrder.dto';
 
 @Injectable()
 export class OrdersRepository {
@@ -24,7 +23,6 @@ export class OrdersRepository {
     ){}
 
     async addOrder(userId: string, products: any){
-        let total = 0;
 
         const user = await this.userRepository.findOneBy({id: userId});
 
@@ -38,10 +36,12 @@ export class OrdersRepository {
 
         const newOrder = await this.orderRepository.save(order);
 
+
+        let total = 0;
         const productsArray = await Promise.all(
             products.map(async (element) => {
-                const product = await this.productRepository.findOneBy({
-                    id: element.id
+                const product = await this.productRepository.findOne({
+                    where: { id: element.id }
                 });
                 if(!product){
                     // throw new Error(`Product with id ${element.productId} not found`);
