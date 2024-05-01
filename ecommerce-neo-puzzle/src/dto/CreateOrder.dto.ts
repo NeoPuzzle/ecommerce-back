@@ -1,16 +1,14 @@
-import { ArrayMinSize, IsArray, IsNotEmpty, IsNumber, IsUUID, ValidateNested } from "class-validator";
-// import { Type } from "class-transformer";
-import { CreateProductDto } from "./CreateProduct.dto";
+import { ArrayMinSize, ArrayNotEmpty, IsArray, IsNotEmpty, IsUUID } from "class-validator";
+import { Products } from "src/entities/products.entity";
 
 export class CreateOrderDto {
     @IsNotEmpty()
     @IsUUID()
     userId: string;
 
-    @IsNotEmpty()
+    // @IsNotEmpty()
     @IsArray()
+    // @ArrayNotEmpty()
     @ArrayMinSize(1)
-    @ValidateNested({ each: true })
-    // @Type(() => CreateProductDto)
-    products: CreateProductDto[];
+    products: Partial<Products>[];
 }

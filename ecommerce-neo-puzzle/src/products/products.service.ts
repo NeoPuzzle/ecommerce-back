@@ -11,9 +11,9 @@ export class ProductsService {
         return this.productsRepository.getProducts(page, limit);
     }
 
-    // async getProductById(id: string) {
-    //     return this.productsRepository.getProductById(id);
-    // }
+    async getProductById(id: string) {
+        return this.productsRepository.getProduct(id);
+    }
 
     async addProducts() {
         return this.productsRepository.addProducts();

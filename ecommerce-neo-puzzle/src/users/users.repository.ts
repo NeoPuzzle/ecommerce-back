@@ -1,9 +1,8 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { readdir } from "fs/promises";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Users } from "../entities/users.entity";
-import { Repository } from "typeorm";
-import { CreateUserDto } from "src/dto/CreateUser.dto";
+import { Not, Repository } from "typeorm";
 
 
 @Injectable()
@@ -31,27 +30,15 @@ export class UsersRepository {
                 orders: true
             },
         });
-        if (!user) return `User with id ${id} not found`;
+        if (!user) throw new NotFoundException(`User with id ${id} not found`);
         const {password, ...userNoPassword} = user
         return userNoPassword;
         
     }
-    async addUser(createUserDto: CreateUserDto) {
-        const newUser = new Users();
-        newUser.name = createUserDto.name;
-        newUser.email = createUserDto.email;
-        newUser.password = createUserDto.password;
-        newUser.phone = createUserDto.phone;
-        newUser.country = createUserDto.country;
-        newUser.address = createUserDto.address;
-        newUser.city = createUserDto.city;
-
+    async addUser(user: Users) {
+        const newUser = await this.userRepository.save(user);
         const { password, ...userNoPassword } = newUser;
-        
-        await this.userRepository.save(newUser);
-
-        return userNoPassword;       
-        
+        return userNoPassword;
     }
     async updateUser(id: string, user: Users) {
         await this.userRepository.update(id, user);
@@ -61,7 +48,7 @@ export class UsersRepository {
     }
     async deleteUser(id: string) {
         const user = await this.userRepository.findOneBy({id});
-        if (!user) return `User with id ${id} not found`;
+        if (!user) throw new NotFoundException(`User with id ${id} not found`);
         this.userRepository.remove(user);
         const { password, ...userNoPassword } = user;
         return userNoPassword;

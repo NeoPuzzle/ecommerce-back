@@ -9,6 +9,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { OrdersModule } from './orders/orders.module';
 import { Categories } from './entities/categories.entity';
 import { Products } from './entities/products.entity';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { Products } from './entities/products.entity';
       useFactory: (configService: ConfigService) => 
         configService.get('typeorm')
     }),
-    AuthModule, ProductsModule, UsersModule, CategoriesModule, OrdersModule],
+    AuthModule, ProductsModule, UsersModule, CategoriesModule, OrdersModule, FilesModule],
   controllers: [],
   providers: [],
 })
