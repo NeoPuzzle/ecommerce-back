@@ -10,6 +10,7 @@ import { OrdersModule } from './orders/orders.module';
 import { Categories } from './entities/categories.entity';
 import { Products } from './entities/products.entity';
 import { FilesModule } from './files/files.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -23,7 +24,13 @@ import { FilesModule } from './files/files.module';
       useFactory: (configService: ConfigService) => 
         configService.get('typeorm')
     }),
-    AuthModule, ProductsModule, UsersModule, CategoriesModule, OrdersModule, FilesModule],
+    AuthModule, ProductsModule, UsersModule, CategoriesModule, OrdersModule, FilesModule,
+    JwtModule.register({
+      global: true,
+      signOptions: { expiresIn: '1h' },
+      secret: process.env.JWT_SECRET,
+    }),
+  ],
   controllers: [],
   providers: [],
 })
