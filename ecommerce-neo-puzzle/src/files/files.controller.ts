@@ -21,7 +21,7 @@ export class FilesController {
                     message: 'File too large. Max size allowed is 200KB',
                 }),
                 new FileTypeValidator({
-                    fileType: /(jpg|jpeg|png|webp)$/,
+                    fileType: /(jpg|jpeg|png|svg|gif)$/,
                 }),
             ]
         }),

@@ -9,6 +9,7 @@ export class ProductsController {
 
     @Get()
     async getProducts(@Query('page') page: string,@Query('limit') limit: string){
+        if (!page || !limit) return this.productsService.getProducts(1, 5);
         return this.productsService.getProducts(Number(page), Number(limit));
     }
 

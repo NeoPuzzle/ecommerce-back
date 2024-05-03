@@ -18,6 +18,9 @@ export class Users {
     @Column({type:'varchar' , nullable: false})
     password: string;
 
+    @Column({default: false})
+    isAdmin: boolean;
+
     @Column({type:'int', nullable: true})
     phone: number;
 

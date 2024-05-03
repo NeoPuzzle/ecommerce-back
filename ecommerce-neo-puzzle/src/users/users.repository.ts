@@ -31,7 +31,9 @@ export class UsersRepository {
             },
         });
         if (!user) throw new NotFoundException(`User with id ${id} not found`);
-        const {password, ...userNoPassword} = user
+
+        const {isAdmin, ...userNoAdmin} = user;
+        const {password, ...userNoPassword} = userNoAdmin;
         return userNoPassword;
         
     }

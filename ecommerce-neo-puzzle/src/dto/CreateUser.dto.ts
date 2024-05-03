@@ -1,5 +1,5 @@
 import { PickType } from "@nestjs/swagger";
-import { IsEmail, IsNotEmpty, IsNumber, IsString, Matches, MaxLength, Min, MinLength } from "class-validator";
+import { IsEmail, IsEmpty, IsNotEmpty, IsNumber, IsString, Matches, MaxLength, Min, MinLength } from "class-validator";
 import { Orders } from "src/entities/orders.entity";
 
 export class CreateUserDto {
@@ -24,6 +24,9 @@ export class CreateUserDto {
     @MinLength(8)
     @MaxLength(15)
     password: string;
+
+    @IsEmpty()
+    isAdmin: boolean;
 
     @IsNotEmpty()
     @IsString()
