@@ -1,3 +1,4 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { Categories } from "src/entities/categories.entity";
 import { OrderDetails } from "src/entities/orderdetails.entity";
 import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";

@@ -2,11 +2,12 @@ import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, Query, 
 import { UsersService } from './users.service';
 import { Users } from '../entities/users.entity';
 import { AuthGuard } from '../auth/guards/auth.guard';
-import { CreateUserDto } from 'src/dto/CreateUser.dto';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from 'src/enum/roles.enum';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Users')
 @Controller('users')
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
@@ -21,27 +22,27 @@ export class UsersController {
         return this.usersService.getUsers(1, 5);
     }
 
+    @ApiBearerAuth()
     @Get(':id')
+    @Roles(Role.ADMIN)
     @UseGuards(AuthGuard)
     getUserById(@Param('id', ParseUUIDPipe) id: string){
         return this.usersService.getUserById(id);
     }
 
-    // @Post()
-    // createUser(@Body() user: CreateUserDto){
-    //     return this.usersService.addUser(user);
-    // }
-
+    @ApiBearerAuth()
     @Put(':id')
     @Roles(Role.ADMIN)
     @UseGuards(AuthGuard, RolesGuard)
-    updateUser(@Param('id') id: string, @Body() user: Users){
+    updateUser(@Param('id', ParseUUIDPipe) id: string, @Body() user: Users){
         return this.usersService.updateUser(id, user);
     }
 
+    @ApiBearerAuth()
     @Delete(':id')
     @UseGuards(AuthGuard)
-    deleteUser(@Param('id') id: string){
+    @Roles(Role.ADMIN)
+    deleteUser(@Param('id', ParseUUIDPipe) id: string){
         return this.usersService.deleteUser(id);
     }
 }

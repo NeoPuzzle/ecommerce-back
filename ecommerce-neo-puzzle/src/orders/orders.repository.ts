@@ -1,11 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Orders } from '../entities/orders.entity';
-import { Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Products } from 'src/entities/products.entity';
 import { OrderDetails } from 'src/entities/orderdetails.entity';
 import { Users } from 'src/entities/users.entity';
-import { CreateOrderDto } from 'src/dto/CreateOrder.dto';
 
 @Injectable()
 export class OrdersRepository {
@@ -84,10 +83,7 @@ export class OrdersRepository {
                 },
             },
             });
-        if(!order){
-            // throw new Error(`Order with id ${id} not found`);
-            return `Order with id ${id} not found`
-        }
+        if(!order) throw new NotFoundException(`Order with id ${id} not found`);
 
         return order;
     }

@@ -22,14 +22,12 @@ export class AuthService {
 
         const hashedPassword = await bcrypt.hash(user.password, 10);
         if(!hashedPassword) throw new BadRequestException('Error hashing password');
-        this.usersRepository.addUser({...user, password: hashedPassword});
-
-        return { success: 'User created successfully'}
+        return await this.usersRepository.addUser({...user, password: hashedPassword});
     }
 
     async signIn(email: string, password: string) {
         const user = await this.usersRepository.getUserByEmail(email);
-        if(!user) throw new BadRequestException('User not found');
+        if(!user) throw new BadRequestException('Invalid credentials');
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if(!isPasswordValid) throw new BadRequestException('Invalid credentials');
 

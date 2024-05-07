@@ -1,8 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { readdir } from "fs/promises";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Users } from "../entities/users.entity";
-import { Not, Repository } from "typeorm";
+import { Repository } from "typeorm";
 
 
 @Injectable()
@@ -20,6 +19,7 @@ export class UsersRepository {
             take: limit,
             skip: skip,
         });
+        if (!users.length) throw new NotFoundException('No users found');
         return users.map(({password, ...userNoPassword}) => userNoPassword);
     }
     
@@ -39,7 +39,8 @@ export class UsersRepository {
     }
     async addUser(user: Users) {
         const newUser = await this.userRepository.save(user);
-        const { password, ...userNoPassword } = newUser;
+        const dbUser = await this.userRepository.findOneBy({id: newUser.id});
+        const { password, ...userNoPassword } = dbUser;
         return userNoPassword;
     }
     async updateUser(id: string, user: Users) {

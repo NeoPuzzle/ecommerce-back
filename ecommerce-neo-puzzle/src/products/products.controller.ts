@@ -1,8 +1,13 @@
-import { Body, Controller, Delete, Get, Param, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Put, Query, UseGuards } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Products } from 'src/entities/products.entity';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/decorators/roles.decorator';
+import { Role } from 'src/enum/roles.enum';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
+@ApiTags('Products')
 @Controller('products')
 export class ProductsController {
     constructor(private readonly productsService: ProductsService) {}
@@ -13,26 +18,25 @@ export class ProductsController {
         return this.productsService.getProducts(Number(page), Number(limit));
     }
 
-    // @Get(':id')
-    // async getProductById(@Param('id') id: string){
-    //     return this.productsService.getProductById(id);
-    // }
-
     @Get('seeder')
     //@UseGuards(AuthGuard)
     async addProducts(){
         return this.productsService.addProducts();
     }
 
+    @ApiBearerAuth()
     @Put(':id')
-    @UseGuards(AuthGuard)
-    async updateProduct(@Param('id') id: string, @Body() product: Products){
+    @Roles(Role.ADMIN)
+    @UseGuards(AuthGuard, RolesGuard)
+    async updateProduct(@Param('id', ParseUUIDPipe) id: string, @Body() product: Products){
         return this.productsService.updateProduct(id, product);
     }
 
+    @ApiBearerAuth()
     @Delete(':id')
-    @UseGuards(AuthGuard)
-    async deleteProduct(@Param('id') id: string){
+    @Roles(Role.ADMIN)
+    @UseGuards(AuthGuard, RolesGuard)    
+    async deleteProduct(@Param('id', ParseUUIDPipe) id: string){
         return this.productsService.deleteProduct(id);
     }
 }

@@ -7,14 +7,11 @@ import typeOrmConfig from './config/typeorm';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CategoriesModule } from './categories/categories.module';
 import { OrdersModule } from './orders/orders.module';
-import { Categories } from './entities/categories.entity';
-import { Products } from './entities/products.entity';
 import { FilesModule } from './files/files.module';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Categories, Products]),
     ConfigModule.forRoot({
     isGlobal: true,
     load: [typeOrmConfig]
@@ -24,7 +21,12 @@ import { JwtModule } from '@nestjs/jwt';
       useFactory: (configService: ConfigService) => 
         configService.get('typeorm')
     }),
-    AuthModule, ProductsModule, UsersModule, CategoriesModule, OrdersModule, FilesModule,
+    AuthModule, 
+    ProductsModule, 
+    UsersModule, 
+    CategoriesModule, 
+    OrdersModule, 
+    FilesModule,
     JwtModule.register({
       global: true,
       signOptions: { expiresIn: '1h' },

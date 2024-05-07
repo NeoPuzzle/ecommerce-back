@@ -30,23 +30,11 @@ export class ProductsRepository {
         return products;
     }
 
-    // async getProductById(id: string) {
-    //     const product = this.products.findIndex(product => product.id === id);
-    //     if (product === -1) return `Product with id ${id} not found`;
-    //     return this.products[product];
-    // }
-
     async getProduct(id: string) {
         const product = this.productRepository.findOneBy({id});
         if (!product) throw new NotFoundException(`Product with id ${id} not found`);
         return product;
     }
-
-    // async createProduct(product:  IProduct) {
-    //     const id = this.products.length + 1;
-    //     this.products = [...this.products, { id, ...product }];
-    //     return { id, ...product };
-    // }
 
     async addProducts() {
         const categories = await this.categoryRepository.find();
