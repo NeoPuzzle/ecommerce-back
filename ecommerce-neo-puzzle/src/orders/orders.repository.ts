@@ -26,7 +26,6 @@ export class OrdersRepository {
         const user = await this.userRepository.findOneBy({id: userId});
 
         if(!user){
-            // throw new Error('User not found');
             throw new NotFoundException('User not found');
         }
         const order = new Orders();
@@ -43,7 +42,6 @@ export class OrdersRepository {
                     where: { id: element.id }
                 });
                 if(!product){
-                    // throw new Error(`Product with id ${element.productId} not found`);
                     throw new NotFoundException(`Product with id ${element.id} not found`);
                 }
 

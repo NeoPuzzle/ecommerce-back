@@ -1,6 +1,6 @@
-import { OrderDetails } from "src/entities/orderdetails.entity";
-import { Users } from "src/entities/users.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { OrderDetails } from "./orderdetails.entity";
+import { Users } from "./users.entity";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({
     name: 'orders'

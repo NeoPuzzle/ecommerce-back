@@ -14,8 +14,8 @@ async function bootstrap() {
   .setVersion('0.0.1')
   .addBearerAuth()
   .build();
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api', app, document);
+  const documentSwagger = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api', app, documentSwagger);
   await app.listen(3000);
   console.log(`Server listening on port 3000`);
 }

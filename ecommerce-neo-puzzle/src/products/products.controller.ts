@@ -13,13 +13,15 @@ export class ProductsController {
     constructor(private readonly productsService: ProductsService) {}
 
     @Get()
-    async getProducts(@Query('page') page: string,@Query('limit') limit: string){
+    async getProducts(
+        @Query('page') page: string,
+        @Query('limit') limit: string
+    ){
         if (!page || !limit) return this.productsService.getProducts(1, 5);
         return this.productsService.getProducts(Number(page), Number(limit));
     }
 
     @Get('seeder')
-    //@UseGuards(AuthGuard)
     async addProducts(){
         return this.productsService.addProducts();
     }

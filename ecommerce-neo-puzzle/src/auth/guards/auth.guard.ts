@@ -1,22 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { Observable } from "rxjs";
-import { Role } from "src/enum/roles.enum";
-
-
-// function validate(request: Request) {
-//     if(!request.headers.authorization) return false;
-//     const authHeader = request.headers.authorization;
-//     //* authHeader = Basic: email:password
-//     const auth = authHeader.split(' ')[1];
-//     //* auth = email:password
-//     if(!auth) return false;
-
-//     const [email, password] = auth.split(':');
-//     if(!email || !password) return false;
-//     return true;
-// }
-
 
 @Injectable()
 export class AuthGuard implements CanActivate {

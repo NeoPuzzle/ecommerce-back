@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, Query, UseGuards, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Put, Query, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Users } from '../entities/users.entity';
 import { AuthGuard } from '../auth/guards/auth.guard';
@@ -12,10 +12,14 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
+    @ApiBearerAuth()
     @Get()
     @Roles(Role.ADMIN)
     @UseGuards(AuthGuard, RolesGuard)
-    getUsers(@Query('page') page: string, @Query('limit') limit: string){
+    getUsers(
+        @Query('page') page: string, 
+        @Query('limit') limit: string
+    ){
         if (page && limit){
             return this.usersService.getUsers(Number(page), Number(limit));
         }

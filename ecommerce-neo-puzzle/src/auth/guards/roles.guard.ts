@@ -1,5 +1,5 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from "@nestjs/common";
-import { Reflector } from "@nestjs/core";
+import  {Reflector}  from "@nestjs/core";
 import { Role } from "src/enum/roles.enum";
 
 @Injectable()
